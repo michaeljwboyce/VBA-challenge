@@ -1,0 +1,101 @@
+Sub StockAnalysis():
+
+Dim ws As Worksheet
+For Each ws In Worksheets
+    ws.Activate
+
+    Dim FinalTicker As String
+    Dim CurrentTicker As String
+    Dim OpenTicker As Double
+    Dim CloseTicker As Double
+    Dim TickChge As Long
+    Dim FinalRow As Long
+    Dim LastCol As Long
+    Dim SumRow As Long
+    Dim SumCol As Long
+    
+    FinalTicker = ws.Cells(2, 1)
+    OpenTicker = ws.Cells(2, 3)
+    FinalRow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+    LastColumn = ws.Cells(1, Columns.Count).End(xlToLeft).Column
+
+    SumRow = 2
+    SumCol = LastColumn + 2
+    TickerSumCol = LastColumn + 2
+    YearlyChangeCol = LastColumn + 3
+    ChangeCol = LastColumn + 4
+    TotalVolCol = LastColumn + 5
+    
+
+
+    ws.Cells(1, TickerSumCol) = "Ticker"
+    ws.Cells(1, YearlyChangeCol) = "Yearly Change"
+    ws.Cells(1, ChangeCol) = "Percent Change"
+    ws.Cells(1, TotalVolCol) = "Total Stock Volume"
+    ws.Cells(2, 15) = "Greatest % Increase"
+    ws.Cells(3, 15) = "Greatest % Decrease"
+    ws.Cells(4, 15) = "Greatest Total Volume"
+    ws.Cells(1, 16) = "Ticker"
+    ws.Cells(1, 17) = "Value"
+  
+        For i = 2 To FinalRow + 1
+
+                CurrentTicker = ws.Cells(i, 1)
+                CurrVol = ws.Cells(i, 7)
+                
+                If CurrentTicker = FinalTicker Then
+                TickVol = TickVol + CurrVol
+                CloseTicker = ws.Cells(i, 6).Value
+                Else
+
+                ws.Cells(SumRow, SumCol + 1) = CloseTicker - OpenTicker
+                ws.Cells(SumRow, SumCol) = FinalTicker
+                
+                If ws.Cells(SumRow, SumCol + 1) >= 0 Then
+                ws.Cells(SumRow, SumCol + 1).Interior.ColorIndex = 4
+                Else: ws.Cells(SumRow, SumCol + 1).Interior.ColorIndex = 3
+                End If
+
+                If OpenTicker = 0 Then
+                ws.Cells(SumRow, SumCol + 2) = 0
+                Else
+                ws.Cells(SumRow, SumCol + 2) = (CloseTicker - OpenTicker) / OpenTicker
+                End If
+                
+                ws.Cells(SumRow, SumCol + 3) = TickVol
+                OpenTicker = ws.Cells(i, 3).Value
+                CloseTicker = ws.Cells(i, 6).Value
+                TickVol = ws.Cells(i, 7).Value
+                SumRow = SumRow + 1
+                FinalTicker = ws.Cells(i, 1)
+                End If
+ 
+
+        Next i
+        
+                ws.Cells(2, 17).NumberFormat = "0.00%"
+                ws.Cells(3, 17).NumberFormat = "0.00%"
+                ws.Columns("A:Z").AutoFit
+                ws.Range("K:K").NumberFormat = "0.00%"
+                
+                lSumRow = ws.Cells(Rows.Count, 9).End(xlUp).Row
+                ws.Range("I2:L" & lSumRow).Sort key1:=ws.Range("L2:L" & lSumRow), order1:=xlDescending, Header:=xlNo
+                ws.Range("P4") = ws.Range("I2")
+                ws.Range("Q4") = ws.Range("L2")
+                                              
+                ws.Range("I2:L" & lSumRow).Sort key1:=ws.Range("K2:K" & lSumRow), order1:=xlAscending, Header:=xlNo
+                ws.Range("P3") = ws.Range("I2")
+                ws.Range("Q3") = ws.Range("K3")
+                
+                ws.Range("I2:L" & lSumRow).Sort key1:=ws.Range("K2:K" & lSumRow), order1:=xlDescending, Header:=xlNo
+                ws.Range("P2") = ws.Range("I2")
+                ws.Range("Q2") = ws.Range("K2")
+                
+                ws.Range("I2:L" & lSumRow).Sort key1:=ws.Range("I2:I" & lSumRow), order1:=xlAscending, Header:=xlNo
+                                
+               
+Next ws
+
+End Sub
+
+
